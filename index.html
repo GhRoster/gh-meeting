@@ -2,119 +2,157 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>카페 통합 관리 시스템 (Cloud)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카페 통합 관리 시스템</title>
     <style>
-        /* (이전 스타일과 동일 - 지면상 중략) */
         :root { --primary: #4a3f35; --bg: #f5f5f5; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .hidden { display: none !important; }
-        #login-container { max-width: 400px; margin: 100px auto; padding: 20px; background: white; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 5px; }
-        header { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
-        .nav-tabs { display: flex; gap: 10px; padding: 10px; background: #eee; }
-        .card { background: white; margin: 10px; padding: 15px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        #login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-tabs { display: flex; gap: 5px; padding: 10px; background: #e0e0e0; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: #d1d1d1; cursor: pointer; }
+        .tab-btn.active { background: #fff; font-weight: bold; }
+        .card { background: #fff; margin: 15px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f8f8; }
     </style>
 </head>
 <body>
 
 <div id="login-container">
     <h2>☕ 카페 관리 로그인</h2>
-    <input type="text" id="user-id" placeholder="아이디">
-    <input type="password" id="user-pw" placeholder="비밀번호">
+    <input type="text" id="user-id" placeholder="아이디" aria-label="아이디">
+    <input type="password" id="user-pw" placeholder="비밀번호" aria-label="비밀번호">
     <button onclick="handleLogin()">로그인</button>
 </div>
 
 <div id="main-app" class="hidden">
     <header>
-        <span id="user-info"></span>
-        <button onclick="location.reload()" style="width:auto;">로그아웃</button>
+        <span id="user-info">접속 중...</span>
+        <button onclick="location.reload()" style="width:auto; padding: 5px 15px;">로그아웃</button>
     </header>
-    <div class="nav-tabs">
-        <button onclick="showTab('write')">기록하기</button>
-        <button id="tab-admin" class="hidden" onclick="showTab('admin')">전체 취합</button>
-    </div>
+    
+    <nav class="nav-tabs">
+        <button class="tab-btn active" id="btn-write" onclick="showTab('write')">기록하기</button>
+        <button class="tab-btn hidden" id="btn-admin" onclick="showTab('admin')">전체 취합</button>
+    </nav>
 
-    <div id="sec-write" class="card">
-        <h3>📝 신규 내역 기록</h3>
-        <select id="log-type">
-            <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
-            <option value="손님 요청사항">💬 손님 요청사항</option>
-            <option value="매장 보수 필요">🔧 매장 보수 필요</option>
-            <option value="직원 요청 사항">🙋 직원 요청 사항</option>
-        </select>
-        <textarea id="log-content" placeholder="내용을 입력하세요..."></textarea>
-        <button onclick="saveLog()">구글 시트에 저장</button>
-    </div>
+    <main class="content">
+        <div id="sec-write" class="card">
+            <h3>📝 신규 내역 기록</h3>
+            <select id="log-type" title="기록 유형 선택">
+                <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
+                <option value="손님 요청사항">💬 손님 요청사항</option>
+                <option value="매장 보수 필요">🔧 매장 보수 필요</option>
+                <option value="직원 요청 사항">🙋 직원 요청 사항</option>
+            </select>
+            <textarea id="log-content" placeholder="내용을 입력하세요..." title="내역 상세 내용"></textarea>
+            <button onclick="saveLog()">기록 제출</button>
+        </div>
 
-    <div id="sec-admin" class="card hidden">
-        <h3>📊 전 매장 통합 리포트</h3>
-        <table id="admin-table">
-            <thead><tr><th>날짜</th><th>매장</th><th>구분</th><th>내용</th></tr></thead>
-            <tbody id="admin-list"></tbody>
-        </table>
-    </div>
+        <div id="sec-admin" class="card hidden">
+            <h3>📊 전 매장 통합 리포트</h3>
+            <table>
+                <thead>
+                    <tr><th>날짜</th><th>매장</th><th>구분</th><th>내용</th></tr>
+                </thead>
+                <tbody id="admin-list">
+                    </tbody>
+            </table>
+        </div>
+    </main>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwN1sXOinhK6auQALpCPhsMQZk5GP4ZDk-PmemSpWp5ty-S0ej5r7Yq_ODntVRK4fld/exec"; 
+    /** * [필독] API_URL 부분을 본인의 구글 앱스 스크립트 웹 앱 URL로 반드시 수정하세요! 
+     * 수정하지 않으면 로그인이 작동하지 않습니다.
+     */
+    const API_URL = "https://script.google.com/macros/s/AKfycbzBRJ0rCm-BJcc-cbJUKUmAi_OSx2HSH-yGgqvyOHHRSki6XtKewZl1eaVeqauBDU4a/exec"; 
+    
     let currentUser = null;
 
     async function handleLogin() {
         const id = document.getElementById('user-id').value;
         const pw = document.getElementById('user-pw').value;
-        
-        const resp = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'login', id, pw })
-        });
-        const result = await resp.text();
 
-        if (result !== "Fail") {
-            const data = JSON.parse(result);
-            currentUser = { id, role: data.role };
-            initApp();
-        } else {
-            alert("로그인 실패");
+        if (!id || !pw) return alert("아이디와 비밀번호를 입력해주세요.");
+        if (API_URL.includes("여기에")) return alert("API_URL 설정이 필요합니다 (코드 수정 필요).");
+
+        try {
+            const resp = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', id, pw })
+            });
+            const result = await resp.text();
+
+            if (result !== "Fail") {
+                const data = JSON.parse(result);
+                currentUser = { id, role: data.role };
+                initApp();
+            } else {
+                alert("아이디 또는 비밀번호가 잘못되었습니다.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("연결 오류: 구글 스크립트 설정을 확인하세요.");
         }
     }
 
     function initApp() {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('user-info').innerText = `${currentUser.id}님 환영합니다.`;
-        if (currentUser.role === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
+        document.getElementById('user-info').innerText = `${currentUser.id}님 (${currentUser.role})`;
+        
+        if (currentUser.role === 'admin') {
+            document.getElementById('btn-admin').classList.remove('hidden');
+        }
     }
 
     function showTab(tabId) {
         document.getElementById('sec-write').classList.toggle('hidden', tabId !== 'write');
         document.getElementById('sec-admin').classList.toggle('hidden', tabId !== 'admin');
+        document.getElementById('btn-write').classList.toggle('active', tabId === 'write');
+        document.getElementById('btn-admin').classList.toggle('active', tabId === 'admin');
         if (tabId === 'admin') loadLogs();
     }
 
     async function saveLog() {
         const type = document.getElementById('log-type').value;
         const content = document.getElementById('log-content').value;
+        if (!content) return alert("내용을 적어주세요.");
+
+        // 아이디에 '1'이 포함되면 1호점, '2'가 포함되면 2호점으로 임시 분류
         const branch = currentUser.role === 'admin' ? '본사' : (currentUser.id.includes('1') ? '1호점' : '2호점');
 
-        await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'saveLog', id: currentUser.id, branch, type, content })
-        });
-        alert("시트에 저장되었습니다!");
-        document.getElementById('log-content').value = '';
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'saveLog', id: currentUser.id, branch, type, content })
+            });
+            alert("저장되었습니다.");
+            document.getElementById('log-content').value = '';
+        } catch (e) {
+            alert("저장 실패");
+        }
     }
 
     async function loadLogs() {
-        const resp = await fetch(API_URL);
-        const data = await resp.json();
         const list = document.getElementById('admin-list');
-        list.innerHTML = '';
-        data.slice(1).reverse().forEach(row => {
-            list.innerHTML += `<tr><td>${new Date(row[0]).toLocaleDateString()}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
-        });
+        list.innerHTML = "<tr><td colspan='4'>데이터 불러오는 중...</td></tr>";
+        try {
+            const resp = await fetch(API_URL);
+            const data = await resp.json();
+            list.innerHTML = '';
+            data.slice(1).reverse().forEach(row => {
+                list.innerHTML += `<tr><td>${new Date(row[0]).toLocaleDateString()}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
+            });
+        } catch (e) {
+            list.innerHTML = "<tr><td colspan='4'>데이터를 가져오지 못했습니다.</td></tr>";
+        }
     }
 </script>
 </body>
