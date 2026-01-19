@@ -9,12 +9,10 @@
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         
-        /* 로딩 스피너 */
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 로그인 & 레이아웃 */
         #login-container { max-width: 350px; margin: 60px auto; padding: 30px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
         input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
@@ -140,23 +138,37 @@
         document.getElementById('special-bakery').classList.toggle('hidden', type !== '베이커리 피드백');
     }
 
+    // 로그인 핸들러 수정
     async function handleLogin() {
         const name = document.getElementById('user-name').value;
         const pw = document.getElementById('user-pw').value;
-        if(!name || !pw) return alert("이름과 비밀번호를 입력해주세요.");
+        if(!name || !pw) return alert("이름과 비밀번호를 모두 입력해주세요.");
+        
         showLoading(true);
         try {
             const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', name, pw }) });
             const res = await resp.json();
+            
             if(res.status === "Success") {
+                alert("로그인 성공!");
                 currentUser = { id: name, role: res.role };
                 document.getElementById('login-container').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 if(currentUser.role === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
                 showTab('write');
-            } else alert("정보가 일치하지 않습니다.");
-        } catch(e) { alert("연결 오류"); }
-        finally { showLoading(false); }
+            } else if (res.status === "NoName") {
+                alert("등록되지 않은 이름입니다.");
+            } else if (res.status === "WrongPw") {
+                alert("비밀번호가 틀렸습니다.");
+            } else {
+                alert("로그인 정보가 올바르지 않습니다.");
+            }
+        } catch(e) { 
+            // 실제 네트워크 오류일 때만 연결 오류 메시지 출력
+            alert("서버와의 통신에 실패했습니다. 인터넷 연결을 확인하세요."); 
+        } finally { 
+            showLoading(false); 
+        }
     }
 
     async function handleRegister() {
@@ -173,7 +185,7 @@
         document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('sec-' + tabId).classList.remove('hidden');
-        event.currentTarget.classList.add('active');
+        if(event) event.currentTarget.classList.add('active');
         if(tabId === 'history' || tabId === 'admin') loadLogs();
         if(tabId === 'inventory') loadInventory();
     }
