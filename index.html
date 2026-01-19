@@ -5,105 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>그라운드헤븐 관리 시스템</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f4f7f6; }
-        body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background: var(--bg); margin: 0; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f8f9fa; --card: #ffffff; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.6; }
         .hidden { display: none !important; }
         
-        /* 로그인/회원가입 화면 */
-        #login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary); margin-bottom: 20px; letter-spacing: 1px; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { opacity: 0.9; }
-
-        /* 메인 레이아웃 */
-        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-size: 14px; color: #7f8c8d; }
+        /* 모바일 최적화 레이아웃 */
+        #login-container { max-width: 90%; width: 350px; margin: 60px auto; padding: 30px 20px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); outline: none; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        
+        header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .nav-tabs { display: flex; background: white; position: sticky; top: 55px; z-index: 99; border-bottom: 1px solid #eee; overflow-x: auto; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 15px 5px; border: none; background: none; font-size: 13px; color: #888; white-space: nowrap; }
         .tab-btn.active { color: var(--accent); border-bottom: 3px solid var(--accent); font-weight: bold; }
         
-        .content { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #f9f9f9; color: #34495e; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; color: white; }
-        .admin { background: #e74c3c; } .manager { background: #3498db; } .staff { background: #95a5a6; }
+        .content { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
+        h3 { margin-top: 0; font-size: 18px; color: var(--primary); }
+        
+        /* 로그 아이템 및 피드백 */
+        .log-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; }
+        .log-header { font-size: 12px; color: #999; margin-bottom: 5px; }
+        .log-body { font-size: 15px; margin-bottom: 8px; font-weight: 500; }
+        .admin-reply { background: #fff8f0; padding: 10px; border-radius: 8px; border-left: 4px solid var(--accent); font-size: 13px; margin-top: 10px; }
+        .coffee-data { background: #f0f4f8; padding: 10px; border-radius: 8px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
+        
+        /* 재고 관리 UI */
+        .inv-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .inv-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-sm { width: 35px; height: 35px; padding: 0; margin: 0; border-radius: 50%; }
     </style>
 </head>
 <body>
 
 <div id="login-container">
-    <div class="logo-text">Ground Heaven</div>
-    
+    <div style="font-size: 24px; font-weight: 900; color: var(--primary); margin-bottom: 20px;">Ground Heaven</div>
     <div id="login-form">
-        <input type="text" id="user-id" placeholder="아이디 (한글 가능)">
-        <input type="password" id="user-pw" placeholder="비밀번호">
+        <input type="text" id="user-id" placeholder="아이디" onkeypress="if(event.keyCode==13) handleLogin()">
+        <input type="password" id="user-pw" placeholder="비밀번호" onkeypress="if(event.keyCode==13) handleLogin()">
         <button onclick="handleLogin()">로그인</button>
-        <p style="font-size: 13px; color: #666; margin-top: 20px; cursor: pointer;" onclick="toggleForm(true)">새 계정 만들기</p>
+        <p style="font-size: 13px; color: #666; margin-top: 20px; text-decoration: underline; cursor: pointer;" onclick="toggleForm(true)">회원가입</p>
     </div>
-
     <div id="register-form" class="hidden">
-        <input type="text" id="reg-id" placeholder="사용할 아이디 (한글 가능)">
-        <input type="password" id="reg-pw" placeholder="사용할 비밀번호">
-        <select id="reg-role">
-            <option value="staff">일반직원</option>
-            <option value="manager">매니저</option>
-            <option value="admin">관리자 (대표/사장/실장)</option>
-        </select>
-        <button onclick="handleRegister()" style="background: var(--accent);">회원가입 완료</button>
-        <p style="font-size: 13px; color: #666; margin-top: 20px; cursor: pointer;" onclick="toggleForm(false)">로그인으로 돌아가기</p>
+        <input type="text" id="reg-id" placeholder="사용할 아이디">
+        <input type="password" id="reg-pw" placeholder="비밀번호">
+        <select id="reg-role"><option value="staff">일반직원</option><option value="manager">매니저</option><option value="admin">관리자</option></select>
+        <button onclick="handleRegister()" style="background: var(--accent);">가입 완료</button>
+        <p style="font-size: 13px; color: #666; margin-top: 20px; cursor: pointer;" onclick="toggleForm(false)">돌아가기</p>
     </div>
 </div>
 
 <div id="main-app" class="hidden">
     <header>
-        <span style="font-weight: bold;">Ground Heaven System</span>
-        <span id="user-display" style="font-size: 13px;"></span>
-        <button onclick="location.reload()" style="width:auto; padding: 5px 10px; font-size: 11px; background: rgba(255,255,255,0.2);">로그아웃</button>
+        <span style="font-weight: 800; font-size: 14px;">GROUND HEAVEN</span>
+        <button onclick="location.reload()" style="width:auto; padding: 5px 12px; font-size: 12px; margin:0; background: rgba(255,255,255,0.2);">로그아웃</button>
     </header>
-
     <nav class="nav-tabs">
-        <button class="tab-btn active" id="tab-write" onclick="showTab('write')">기록하기</button>
-        <button class="tab-btn hidden" id="tab-view" onclick="showTab('view')">기록조회(매니저)</button>
-        <button class="tab-btn hidden" id="tab-admin" onclick="showTab('admin')">전체취합(관리자)</button>
+        <button class="tab-btn active" onclick="showTab('write')">기록</button>
+        <button class="tab-btn" onclick="showTab('inventory')">재고관리</button>
+        <button class="tab-btn" onclick="showTab('history')">나의기록</button>
+        <button class="tab-btn hidden" id="tab-admin" onclick="showTab('admin')">관리자</button>
     </nav>
 
     <div class="content">
         <div id="sec-write" class="card">
-            <h3>📝 오늘자 특이사항 기록</h3>
-            <select id="log-type" title="카테고리 선택">
-                <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
-                <option value="손님 요청사항">💬 손님 요청사항</option>
+            <h3>📝 특이사항 작성</h3>
+            <select id="log-type" onchange="toggleSpecialFields()">
+                <option value="일반 특이사항">일반 특이사항</option>
+                <option value="오늘의 커피">☕ 오늘의 커피</option>
+                <option value="베이커리 피드백">🥐 베이커리 피드백</option>
                 <option value="매장 보수 필요">🔧 매장 보수 필요</option>
                 <option value="직원 요청 사항">🙋 직원 요청 사항</option>
-                <option value="로스팅 품질">🔥 원두/로스팅 피드백</option>
             </select>
-            <textarea id="log-content" style="height: 150px;" placeholder="상세 내용을 입력하세요..."></textarea>
-            <button onclick="saveLog()">기록 저장하기</button>
+
+            <div id="special-coffee" class="hidden">
+                <input type="number" id="coffee-dosing" placeholder="도징량 (g)">
+                <input type="number" id="coffee-time" placeholder="추출시간 (sec)">
+                <input type="number" id="coffee-volume" placeholder="추출량 (ml)">
+                <input type="text" id="coffee-taste" placeholder="맛 (산미, 바디감 등)">
+            </div>
+
+            <div id="special-bakery" class="hidden">
+                <input type="text" id="bakery-name" placeholder="베이커리 종류">
+                <input type="number" id="bakery-qty" placeholder="마감 잔여 수량">
+            </div>
+
+            <textarea id="log-content" style="height: 100px;" placeholder="상세 내용을 적어주세요..."></textarea>
+            <button onclick="saveLog()">저장하기</button>
         </div>
 
-        <div id="sec-view" class="card hidden">
-            <h3>📑 매장별 기록 현황</h3>
-            <table id="view-table">
-                <thead><tr><th>날짜</th><th>구분</th><th>내용</th></tr></thead>
-                <tbody id="view-list"></tbody>
-            </table>
+        <div id="sec-inventory" class="card hidden">
+            <h3>🥐 실시간 재고 관리</h3>
+            <div id="inv-list">불러오는 중...</div>
+            <hr>
+            <p style="font-size: 12px; color: #888;">신규 품목 추가</p>
+            <input type="text" id="new-inv-name" placeholder="품목명">
+            <button onclick="updateStock(document.getElementById('new-inv-name').value, 0)" style="background: #95a5a6;">품목 등록</button>
+        </div>
+
+        <div id="sec-history" class="card hidden">
+            <h3>📑 나의 기록 & 피드백</h3>
+            <div id="my-log-list">기록이 없습니다.</div>
         </div>
 
         <div id="sec-admin" class="card hidden">
-            <h3>📊 전사 통합 리포트</h3>
-            <table id="admin-table">
-                <thead><tr><th>날짜</th><th>작성자</th><th>구분</th><th>내용</th></tr></thead>
-                <tbody id="admin-list"></tbody>
-            </table>
+            <h3>📊 전체 리포트 & 답글</h3>
+            <div id="all-log-list">데이터가 없습니다.</div>
         </div>
     </div>
 </div>
 
 <script>
-    // [중요] 본인의 구글 앱스 스크립트 URL을 아래에 꼭 넣어주세요!
-    const API_URL = "https://script.google.com/macros/s/AKfycbzBRJ0rCm-BJcc-cbJUKUmAi_OSx2HSH-yGgqvyOHHRSki6XtKewZl1eaVeqauBDU4a/exec"; 
+    const API_URL = "여기에_URL을_입력하세요"; 
     let currentUser = null;
 
     function toggleForm(isReg) {
@@ -111,102 +125,128 @@
         document.getElementById('register-form').classList.toggle('hidden', !isReg);
     }
 
-    // 회원가입
+    function toggleSpecialFields() {
+        const type = document.getElementById('log-type').value;
+        document.getElementById('special-coffee').classList.toggle('hidden', type !== '오늘의 커피');
+        document.getElementById('special-bakery').classList.toggle('hidden', type !== '베이커리 피드백');
+    }
+
+    async function handleLogin() {
+        const id = document.getElementById('user-id').value;
+        const pw = document.getElementById('user-pw').value;
+        try {
+            const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', id, pw }) });
+            const res = await resp.text();
+            if(res !== "Fail") {
+                currentUser = { id, role: JSON.parse(res).role };
+                initApp();
+            } else alert("로그인 실패");
+        } catch(e) { alert("연결 오류"); }
+    }
+
     async function handleRegister() {
         const id = document.getElementById('reg-id').value;
         const pw = document.getElementById('reg-pw').value;
         const role = document.getElementById('reg-role').value;
-        if(!id || !pw) return alert("아이디와 비밀번호를 입력해주세요.");
-
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'register', id, pw, role })
-            });
-            alert("계정이 생성되었습니다! 이제 로그인해주세요.");
-            toggleForm(false);
-        } catch (e) { alert("계정 생성 실패"); }
-    }
-
-    // 로그인
-    async function handleLogin() {
-        const id = document.getElementById('user-id').value;
-        const pw = document.getElementById('user-pw').value;
-
-        try {
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', id, pw })
-            });
-            const result = await resp.text();
-            if(result !== "Fail") {
-                const data = JSON.parse(result);
-                currentUser = { id, role: data.role };
-                initApp();
-            } else { alert("정보가 일치하지 않습니다."); }
-        } catch (e) { alert("연결 오류"); }
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', id, pw, role }) });
+        alert("가입 완료"); toggleForm(false);
     }
 
     function initApp() {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('user-display').innerText = `${currentUser.id}님 [${getRoleName(currentUser.role)}]`;
-
-        // 권한별 탭 활성화
-        if(currentUser.role === 'manager' || currentUser.role === 'admin') {
-            document.getElementById('tab-view').classList.remove('hidden');
-        }
-        if(currentUser.role === 'admin') {
-            document.getElementById('tab-admin').classList.remove('hidden');
-        }
-    }
-
-    function getRoleName(role) {
-        if(role === 'admin') return '관리자';
-        if(role === 'manager') return '매니저';
-        return '일반직원';
+        if(currentUser.role === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
+        showTab('write');
     }
 
     function showTab(tabId) {
-        document.querySelectorAll('.tab-content, .card').forEach(el => {
-            if(el.id.startsWith('sec-')) el.classList.add('hidden');
-        });
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        
+        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('sec-' + tabId).classList.remove('hidden');
-        document.getElementById('tab-' + tabId).classList.add('active');
-        
-        if(tabId === 'view' || tabId === 'admin') loadLogs(tabId);
+        event.target.classList.add('active');
+        if(tabId === 'history' || tabId === 'admin') loadLogs();
+        if(tabId === 'inventory') loadInventory();
     }
 
     async function saveLog() {
         const type = document.getElementById('log-type').value;
         const content = document.getElementById('log-content').value;
-        if(!content) return alert("내용을 입력해주세요.");
+        let details = {};
+        
+        if(type === '오늘의 커피') {
+            details = { 
+                dosing: document.getElementById('coffee-dosing').value,
+                time: document.getElementById('coffee-time').value,
+                vol: document.getElementById('coffee-volume').value,
+                taste: document.getElementById('coffee-taste').value
+            };
+        } else if(type === '베이커리 피드백') {
+            details = { item: document.getElementById('bakery-name').value, qty: document.getElementById('bakery-qty').value };
+        }
 
-        await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'saveLog', id: currentUser.id, type, content })
-        });
-        alert("기록이 구글 시트에 저장되었습니다.");
-        document.getElementById('log-content').value = '';
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveLog', id: currentUser.id, type, content, details }) });
+        alert("저장 성공"); location.reload();
     }
 
-    async function loadLogs(mode) {
+    async function loadInventory() {
         const resp = await fetch(API_URL);
         const data = await resp.json();
-        const list = document.getElementById(mode + '-list');
+        const list = document.getElementById('inv-list');
         list.innerHTML = '';
-        
-        data.slice(1).reverse().forEach(row => {
-            // 매니저는 데이터 열람 가능, 관리자는 전체 열람
-            list.innerHTML += `<tr>
-                <td>${new Date(row[0]).toLocaleDateString()}</td>
-                ${mode === 'admin' ? `<td>${row[1]}</td>` : ''}
-                <td>${row[3]}</td>
-                <td>${row[4]}</td>
-            </tr>`;
+        data.inv.slice(1).forEach(row => {
+            list.innerHTML += `<div class="inv-row">
+                <span>${row[0]} (현재: <b>${row[1]}</b>)</span>
+                <div class="inv-controls">
+                    <button class="btn-sm" onclick="updateStock('${row[0]}', ${row[1]-1})">-</button>
+                    <button class="btn-sm" onclick="updateStock('${row[0]}', ${row[1]+1})" style="background:var(--accent)">+</button>
+                </div>
+            </div>`;
         });
+    }
+
+    async function updateStock(itemName, newStock) {
+        if(!itemName) return;
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateInventory', itemName, newStock }) });
+        loadInventory();
+    }
+
+    async function loadLogs() {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        const myDiv = document.getElementById('my-log-list');
+        const allDiv = document.getElementById('all-log-list');
+        myDiv.innerHTML = ''; allDiv.innerHTML = '';
+
+        data.logs.slice(1).reverse().forEach(row => {
+            const date = new Date(row[0]).toLocaleDateString();
+            const details = JSON.parse(row[4] || '{}');
+            const feedback = row[5] || "";
+            
+            let detailHtml = "";
+            if(row[2] === '오늘의 커피') {
+                detailHtml = `<div class="coffee-data"><span>도징: ${details.dosing}g</span><span>시간: ${details.time}s</span><span>추출: ${details.vol}ml</span><span>맛: ${details.taste}</span></div>`;
+            } else if(row[2] === '베이커리 피드백') {
+                detailHtml = `<div class="coffee-data"><span>종류: ${details.item}</span><span>잔여: ${details.qty}개</span></div>`;
+            }
+
+            const html = `<div class="log-item">
+                <div class="log-header">${date} | ${row[1]} | ${row[2]}</div>
+                <div class="log-body">${row[3]}</div>
+                ${detailHtml}
+                ${feedback ? `<div class="admin-reply">💬 관리자 피드백: ${feedback}</div>` : ''}
+                ${currentUser.role === 'admin' ? `<button onclick="addFeedback('${row[0]}', '${row[1]}')" style="width:auto; padding:5px 10px; font-size:11px;">답글달기</button>` : ''}
+            </div>`;
+
+            if(row[1] === currentUser.id) myDiv.innerHTML += html;
+            allDiv.innerHTML += html;
+        });
+    }
+
+    async function addFeedback(date, id) {
+        const feedback = prompt("피드백 내용을 입력하세요:");
+        if(!feedback) return;
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'adminFeedback', logDate: date, logId: id, feedback }) });
+        alert("피드백 저장 완료"); loadLogs();
     }
 </script>
 </body>
