@@ -3,89 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>카페 통합 관리 시스템</title>
+    <title>그라운드헤븐 관리 시스템</title>
     <style>
-        :root { --primary: #4a3f35; --bg: #f5f5f5; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f4f7f6; }
+        body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; background: var(--bg); margin: 0; }
         .hidden { display: none !important; }
-        #login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        
+        /* 로그인/회원가입 화면 */
+        #login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary); margin-bottom: 20px; letter-spacing: 1px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { opacity: 0.9; }
+
+        /* 메인 레이아웃 */
         header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-tabs { display: flex; gap: 5px; padding: 10px; background: #e0e0e0; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #d1d1d1; cursor: pointer; }
-        .tab-btn.active { background: #fff; font-weight: bold; }
-        .card { background: #fff; margin: 15px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f8f8f8; }
+        .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-size: 14px; color: #7f8c8d; }
+        .tab-btn.active { color: var(--accent); border-bottom: 3px solid var(--accent); font-weight: bold; }
+        
+        .content { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: #f9f9f9; color: #34495e; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; color: white; }
+        .admin { background: #e74c3c; } .manager { background: #3498db; } .staff { background: #95a5a6; }
     </style>
 </head>
 <body>
 
 <div id="login-container">
-    <h2>☕ 카페 관리 로그인</h2>
-    <input type="text" id="user-id" placeholder="아이디" aria-label="아이디">
-    <input type="password" id="user-pw" placeholder="비밀번호" aria-label="비밀번호">
-    <button onclick="handleLogin()">로그인</button>
+    <div class="logo-text">Ground Heaven</div>
+    
+    <div id="login-form">
+        <input type="text" id="user-id" placeholder="아이디 (한글 가능)">
+        <input type="password" id="user-pw" placeholder="비밀번호">
+        <button onclick="handleLogin()">로그인</button>
+        <p style="font-size: 13px; color: #666; margin-top: 20px; cursor: pointer;" onclick="toggleForm(true)">새 계정 만들기</p>
+    </div>
+
+    <div id="register-form" class="hidden">
+        <input type="text" id="reg-id" placeholder="사용할 아이디 (한글 가능)">
+        <input type="password" id="reg-pw" placeholder="사용할 비밀번호">
+        <select id="reg-role">
+            <option value="staff">일반직원</option>
+            <option value="manager">매니저</option>
+            <option value="admin">관리자 (대표/사장/실장)</option>
+        </select>
+        <button onclick="handleRegister()" style="background: var(--accent);">회원가입 완료</button>
+        <p style="font-size: 13px; color: #666; margin-top: 20px; cursor: pointer;" onclick="toggleForm(false)">로그인으로 돌아가기</p>
+    </div>
 </div>
 
 <div id="main-app" class="hidden">
     <header>
-        <span id="user-info">접속 중...</span>
-        <button onclick="location.reload()" style="width:auto; padding: 5px 15px;">로그아웃</button>
+        <span style="font-weight: bold;">Ground Heaven System</span>
+        <span id="user-display" style="font-size: 13px;"></span>
+        <button onclick="location.reload()" style="width:auto; padding: 5px 10px; font-size: 11px; background: rgba(255,255,255,0.2);">로그아웃</button>
     </header>
-    
+
     <nav class="nav-tabs">
-        <button class="tab-btn active" id="btn-write" onclick="showTab('write')">기록하기</button>
-        <button class="tab-btn hidden" id="btn-admin" onclick="showTab('admin')">전체 취합</button>
+        <button class="tab-btn active" id="tab-write" onclick="showTab('write')">기록하기</button>
+        <button class="tab-btn hidden" id="tab-view" onclick="showTab('view')">기록조회(매니저)</button>
+        <button class="tab-btn hidden" id="tab-admin" onclick="showTab('admin')">전체취합(관리자)</button>
     </nav>
 
-    <main class="content">
+    <div class="content">
         <div id="sec-write" class="card">
-            <h3>📝 신규 내역 기록</h3>
-            <select id="log-type" title="기록 유형 선택">
-    <optgroup label="[품질/생산]">
-        <option value="원두 로스팅 품질">🔥 원두 로스팅 품질 (Giesen)</option>
-        <option value="베이커리 생산/품절">🥐 베이커리 생산 및 품절</option>
-    </optgroup>
-    <optgroup label="[매장 운영]">
-        <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
-        <option value="시설 보수/청결">🔧 시설 보수 및 청결</option>
-        <option value="직원 요청/안건">🙋 직원 요청 및 안건</option>
-    </optgroup>
-</select>
-            <textarea id="log-content" placeholder="내용을 입력하세요..." title="내역 상세 내용"></textarea>
-            <button onclick="saveLog()">기록 제출</button>
+            <h3>📝 오늘자 특이사항 기록</h3>
+            <select id="log-type" title="카테고리 선택">
+                <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
+                <option value="손님 요청사항">💬 손님 요청사항</option>
+                <option value="매장 보수 필요">🔧 매장 보수 필요</option>
+                <option value="직원 요청 사항">🙋 직원 요청 사항</option>
+                <option value="로스팅 품질">🔥 원두/로스팅 피드백</option>
+            </select>
+            <textarea id="log-content" style="height: 150px;" placeholder="상세 내용을 입력하세요..."></textarea>
+            <button onclick="saveLog()">기록 저장하기</button>
+        </div>
+
+        <div id="sec-view" class="card hidden">
+            <h3>📑 매장별 기록 현황</h3>
+            <table id="view-table">
+                <thead><tr><th>날짜</th><th>구분</th><th>내용</th></tr></thead>
+                <tbody id="view-list"></tbody>
+            </table>
         </div>
 
         <div id="sec-admin" class="card hidden">
-            <h3>📊 전 매장 통합 리포트</h3>
-            <table>
-                <thead>
-                    <tr><th>날짜</th><th>매장</th><th>구분</th><th>내용</th></tr>
-                </thead>
-                <tbody id="admin-list">
-                    </tbody>
+            <h3>📊 전사 통합 리포트</h3>
+            <table id="admin-table">
+                <thead><tr><th>날짜</th><th>작성자</th><th>구분</th><th>내용</th></tr></thead>
+                <tbody id="admin-list"></tbody>
             </table>
         </div>
-    </main>
+    </div>
 </div>
 
 <script>
-    /** * [필독] API_URL 부분을 본인의 구글 앱스 스크립트 웹 앱 URL로 반드시 수정하세요! 
-     * 수정하지 않으면 로그인이 작동하지 않습니다.
-     */
-    const API_URL = "https://script.google.com/macros/s/AKfycbzBRJ0rCm-BJcc-cbJUKUmAi_OSx2HSH-yGgqvyOHHRSki6XtKewZl1eaVeqauBDU4a/exec"; 
-    
+    // [중요] 본인의 구글 앱스 스크립트 URL을 아래에 꼭 넣어주세요!
+    const API_URL = "https://script.google.com/macros/s/AKfycbwN1sXOinhK6auQALpCPhsMQZk5GP4ZDk-PmemSpWp5ty-S0ej5r7Yq_ODntVRK4fld/exec"; 
     let currentUser = null;
 
+    function toggleForm(isReg) {
+        document.getElementById('login-form').classList.toggle('hidden', isReg);
+        document.getElementById('register-form').classList.toggle('hidden', !isReg);
+    }
+
+    // 회원가입
+    async function handleRegister() {
+        const id = document.getElementById('reg-id').value;
+        const pw = document.getElementById('reg-pw').value;
+        const role = document.getElementById('reg-role').value;
+        if(!id || !pw) return alert("아이디와 비밀번호를 입력해주세요.");
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'register', id, pw, role })
+            });
+            alert("계정이 생성되었습니다! 이제 로그인해주세요.");
+            toggleForm(false);
+        } catch (e) { alert("계정 생성 실패"); }
+    }
+
+    // 로그인
     async function handleLogin() {
         const id = document.getElementById('user-id').value;
         const pw = document.getElementById('user-pw').value;
-
-        if (!id || !pw) return alert("아이디와 비밀번호를 입력해주세요.");
-        if (API_URL.includes("여기에")) return alert("API_URL 설정이 필요합니다 (코드 수정 필요).");
 
         try {
             const resp = await fetch(API_URL, {
@@ -93,71 +139,74 @@
                 body: JSON.stringify({ action: 'login', id, pw })
             });
             const result = await resp.text();
-
-            if (result !== "Fail") {
+            if(result !== "Fail") {
                 const data = JSON.parse(result);
                 currentUser = { id, role: data.role };
                 initApp();
-            } else {
-                alert("아이디 또는 비밀번호가 잘못되었습니다.");
-            }
-        } catch (e) {
-            console.error(e);
-            alert("연결 오류: 구글 스크립트 설정을 확인하세요.");
-        }
+            } else { alert("정보가 일치하지 않습니다."); }
+        } catch (e) { alert("연결 오류"); }
     }
 
     function initApp() {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('user-info').innerText = `${currentUser.id}님 (${currentUser.role})`;
-        
-        if (currentUser.role === 'admin') {
-            document.getElementById('btn-admin').classList.remove('hidden');
+        document.getElementById('user-display').innerText = `${currentUser.id}님 [${getRoleName(currentUser.role)}]`;
+
+        // 권한별 탭 활성화
+        if(currentUser.role === 'manager' || currentUser.role === 'admin') {
+            document.getElementById('tab-view').classList.remove('hidden');
+        }
+        if(currentUser.role === 'admin') {
+            document.getElementById('tab-admin').classList.remove('hidden');
         }
     }
 
+    function getRoleName(role) {
+        if(role === 'admin') return '관리자';
+        if(role === 'manager') return '매니저';
+        return '일반직원';
+    }
+
     function showTab(tabId) {
-        document.getElementById('sec-write').classList.toggle('hidden', tabId !== 'write');
-        document.getElementById('sec-admin').classList.toggle('hidden', tabId !== 'admin');
-        document.getElementById('btn-write').classList.toggle('active', tabId === 'write');
-        document.getElementById('btn-admin').classList.toggle('active', tabId === 'admin');
-        if (tabId === 'admin') loadLogs();
+        document.querySelectorAll('.tab-content, .card').forEach(el => {
+            if(el.id.startsWith('sec-')) el.classList.add('hidden');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById('sec-' + tabId).classList.remove('hidden');
+        document.getElementById('tab-' + tabId).classList.add('active');
+        
+        if(tabId === 'view' || tabId === 'admin') loadLogs(tabId);
     }
 
     async function saveLog() {
         const type = document.getElementById('log-type').value;
         const content = document.getElementById('log-content').value;
-        if (!content) return alert("내용을 적어주세요.");
+        if(!content) return alert("내용을 입력해주세요.");
 
-        // 아이디에 '1'이 포함되면 1호점, '2'가 포함되면 2호점으로 임시 분류
-        const branch = currentUser.role === 'admin' ? '본사' : (currentUser.id.includes('1') ? '1호점' : '2호점');
-
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'saveLog', id: currentUser.id, branch, type, content })
-            });
-            alert("저장되었습니다.");
-            document.getElementById('log-content').value = '';
-        } catch (e) {
-            alert("저장 실패");
-        }
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'saveLog', id: currentUser.id, type, content })
+        });
+        alert("기록이 구글 시트에 저장되었습니다.");
+        document.getElementById('log-content').value = '';
     }
 
-    async function loadLogs() {
-        const list = document.getElementById('admin-list');
-        list.innerHTML = "<tr><td colspan='4'>데이터 불러오는 중...</td></tr>";
-        try {
-            const resp = await fetch(API_URL);
-            const data = await resp.json();
-            list.innerHTML = '';
-            data.slice(1).reverse().forEach(row => {
-                list.innerHTML += `<tr><td>${new Date(row[0]).toLocaleDateString()}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
-            });
-        } catch (e) {
-            list.innerHTML = "<tr><td colspan='4'>데이터를 가져오지 못했습니다.</td></tr>";
-        }
+    async function loadLogs(mode) {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        const list = document.getElementById(mode + '-list');
+        list.innerHTML = '';
+        
+        data.slice(1).reverse().forEach(row => {
+            // 매니저는 데이터 열람 가능, 관리자는 전체 열람
+            list.innerHTML += `<tr>
+                <td>${new Date(row[0]).toLocaleDateString()}</td>
+                ${mode === 'admin' ? `<td>${row[1]}</td>` : ''}
+                <td>${row[3]}</td>
+                <td>${row[4]}</td>
+            </tr>`;
+        });
     }
 </script>
 </body>
