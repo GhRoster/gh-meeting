@@ -2,11 +2,11 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>그라운드헤븐 통합 관리</title>
     <style>
         :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f4f7f6; --card: #ffffff; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         
         /* 로딩 스피너 */
@@ -15,107 +15,104 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* 로그인 & 레이아웃 */
-        #login-container { max-width: 350px; margin: 80px auto; padding: 30px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        button:active { opacity: 0.8; transform: scale(0.98); }
-
+        #login-container { max-width: 350px; margin: 60px auto; padding: 30px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        
         header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 100; }
-        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #eee; overflow-x: auto; sticky; top: 55px; z-index: 90; }
+        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #eee; overflow-x: auto; position: sticky; top: 55px; z-index: 90; }
         .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 14px; color: #888; white-space: nowrap; cursor: pointer; }
         .tab-btn.active { color: var(--accent); border-bottom: 3px solid var(--accent); font-weight: bold; }
 
         .content { padding: 15px; max-width: 600px; margin: 0 auto; }
         .card { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        /* 매장 구분 탭 */
-        .store-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .store-btn { flex: 1; padding: 10px; background: #eee; border-radius: 8px; border: none; font-size: 14px; }
-        .store-btn.active { background: var(--accent); color: white; }
-
         .inv-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
         .inv-controls { display: flex; align-items: center; gap: 15px; }
         .qty-badge { font-weight: bold; font-size: 18px; min-width: 30px; text-align: center; }
         .btn-circle { width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-
-        .log-item { padding: 15px 0; border-bottom: 1px solid #eee; }
-        .admin-reply { background: #fffcf0; padding: 10px; border-radius: 8px; border-left: 4px solid var(--accent); margin-top: 10px; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay" class="hidden">
     <div class="spinner"></div>
-    <p style="margin-top:15px; font-weight:bold; color:var(--primary);">처리 중입니다...</p>
+    <p style="margin-top:15px; font-weight:bold;">처리 중...</p>
 </div>
 
 <div id="login-container">
-    <h2 style="color:var(--primary); margin-bottom:30px;">Ground Heaven</h2>
+    <h2 style="color:var(--primary); margin-bottom:10px;">Ground Heaven</h2>
+    <p style="font-size:12px; color:#888; margin-bottom:30px;">매장 통합 관리 시스템</p>
+    
     <div id="login-form">
-        <input type="text" id="user-id" placeholder="아이디" autofocus>
-        <input type="password" id="user-pw" placeholder="비밀번호">
-        <button id="btn-login" onclick="handleLogin()">로그인</button>
-        <p style="font-size: 13px; color: #888; margin-top: 20px; cursor: pointer;" onclick="toggleForm(true)">회원가입</p>
+        <input type="text" id="user-name" placeholder="이름 (한글)" onkeypress="if(event.keyCode==13) handleLogin()">
+        <input type="password" id="user-pw" pattern="[0-9]*" inputmode="numeric" placeholder="비밀번호 (숫자 4자리)" onkeypress="if(event.keyCode==13) handleLogin()">
+        <button onclick="handleLogin()">로그인</button>
+        <p style="font-size: 13px; color: #888; margin-top: 25px; cursor: pointer;" onclick="toggleForm(true)">신규 바리스타 등록</p>
     </div>
+
     <div id="register-form" class="hidden">
-        <input type="text" id="reg-id" placeholder="새 아이디">
-        <input type="password" id="reg-pw" placeholder="비밀번호">
-        <select id="reg-role"><option value="staff">직원</option><option value="admin">관리자</option></select>
-        <button onclick="handleRegister()" style="background:var(--accent)">가입하기</button>
-        <p style="font-size: 13px; color: #888; margin-top: 20px; cursor: pointer;" onclick="toggleForm(false)">이전으로</p>
+        <input type="text" id="reg-name" placeholder="이름 (한글)">
+        <input type="password" id="reg-pw" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="비밀번호 (숫자 4자리 권장)">
+        <select id="reg-role">
+            <option value="바리스타">바리스타</option>
+            <option value="매니저">매니저</option>
+            <option value="admin">관리자</option>
+        </select>
+        <button onclick="handleRegister()" style="background:var(--accent)">등록 완료</button>
+        <p style="font-size: 13px; color: #888; margin-top: 20px; cursor: pointer;" onclick="toggleForm(false)">로그인으로 돌아가기</p>
     </div>
 </div>
 
 <div id="main-app" class="hidden">
     <header>
-        <span style="font-weight:bold;">GROUND HEAVEN</span>
-        <button onclick="location.reload()" style="width:auto; padding:5px 10px; margin:0; font-size:12px; background:rgba(0,0,0,0.2)">로그아웃</button>
+        <span style="font-weight:bold; font-size:14px;">GROUND HEAVEN</span>
+        <button onclick="location.reload()" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background:rgba(0,0,0,0.2)">로그아웃</button>
     </header>
     <nav class="nav-tabs">
-        <button class="tab-btn active" onclick="showTab('write')">기록하기</button>
+        <button class="tab-btn active" onclick="showTab('write')">기록</button>
         <button class="tab-btn" onclick="showTab('inventory')">실시간재고</button>
-        <button class="tab-btn" onclick="showTab('history')">나의기록</button>
+        <button class="tab-btn" onclick="showTab('history')">나의활동</button>
         <button class="tab-btn hidden" id="tab-admin" onclick="showTab('admin')">관리자</button>
     </nav>
 
     <div class="content">
         <div id="sec-write" class="card">
-            <h3>📝 새 기록 작성</h3>
+            <h3>📝 새 기록</h3>
             <select id="log-type" onchange="toggleSpecialFields()">
                 <option value="일반 특이사항">일반 특이사항</option>
                 <option value="오늘의 커피">☕ 오늘의 커피 (추출)</option>
                 <option value="베이커리 피드백">🥐 베이커리 마감</option>
             </select>
             <div id="special-coffee" class="hidden">
-                <input type="number" id="coffee-dosing" placeholder="도징량(g)">
-                <input type="number" id="coffee-time" placeholder="추출시간(초)">
-                <input type="number" id="coffee-volume" placeholder="추출량(ml)">
+                <input type="number" id="coffee-dosing" placeholder="도징량(g)" inputmode="decimal">
+                <input type="number" id="coffee-time" placeholder="추출시간(초)" inputmode="numeric">
+                <input type="number" id="coffee-volume" placeholder="추출량(ml)" inputmode="numeric">
                 <input type="text" id="coffee-taste" placeholder="맛 평가">
             </div>
             <div id="special-bakery" class="hidden">
-                <input type="text" id="bakery-name" placeholder="베이커리 종류">
-                <input type="number" id="bakery-qty" placeholder="남은 수량">
+                <input type="text" id="bakery-name" placeholder="빵 종류">
+                <input type="number" id="bakery-qty" placeholder="잔여 수량" inputmode="numeric">
             </div>
             <textarea id="log-content" style="height:100px;" placeholder="내용을 입력하세요..."></textarea>
             <button onclick="saveLog()">저장하기</button>
         </div>
 
         <div id="sec-inventory" class="card hidden">
-            <div class="store-selector">
-                <button class="store-btn active" id="btn-fam" onclick="setStore('패밀리')">패밀리 매장</button>
-                <button class="store-btn" id="btn-hev" onclick="setStore('헤븐')">헤븐 매장</button>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="tab-btn active" id="btn-fam" onclick="setStore('패밀리')" style="border:1px solid #ddd; border-radius:8px;">패밀리</button>
+                <button class="tab-btn" id="btn-hev" onclick="setStore('헤븐')" style="border:1px solid #ddd; border-radius:8px;">헤븐</button>
             </div>
-            <div id="inv-list">데이터 로딩 중...</div>
+            <div id="inv-list">불러오는 중...</div>
             <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-            <p style="font-size:12px; color:#888;">신규 품목 추가</p>
             <div style="display:flex; gap:5px;">
-                <input type="text" id="new-inv-name" placeholder="품목명" style="margin:0;">
+                <input type="text" id="new-inv-name" placeholder="신규 품목명" style="margin:0;">
                 <button onclick="addNewItem()" style="width:80px; margin:0; font-size:14px; background:#95a5a6;">추가</button>
             </div>
         </div>
 
         <div id="sec-history" class="card hidden">
-            <h3>📑 나의 활동 내역</h3>
+            <h3>📑 나의 기록</h3>
             <div id="my-log-list"></div>
         </div>
 
@@ -127,27 +124,16 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzBRJ0rCm-BJcc-cbJUKUmAi_OSx2HSH-yGgqvyOHHRSki6XtKewZl1eaVeqauBDU4a/exec"; 
+    const API_URL = "여기에_URL을_입력하세요"; 
     let currentUser = null;
     let currentStore = "패밀리";
     let inventoryData = [];
 
-    // 엔터키 로그인 처리
-    document.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter' && !document.getElementById('login-container').classList.contains('hidden')) {
-            handleLogin();
-        }
-    });
-
-    function showLoading(show) {
-        document.getElementById('loading-overlay').classList.toggle('hidden', !show);
-    }
-
+    function showLoading(show) { document.getElementById('loading-overlay').classList.toggle('hidden', !show); }
     function toggleForm(isReg) {
         document.getElementById('login-form').classList.toggle('hidden', isReg);
         document.getElementById('register-form').classList.toggle('hidden', !isReg);
     }
-
     function toggleSpecialFields() {
         const type = document.getElementById('log-type').value;
         document.getElementById('special-coffee').classList.toggle('hidden', type !== '오늘의 커피');
@@ -155,28 +141,32 @@
     }
 
     async function handleLogin() {
-        const id = document.getElementById('user-id').value;
+        const name = document.getElementById('user-name').value;
         const pw = document.getElementById('user-pw').value;
-        if(!id || !pw) return;
-
+        if(!name || !pw) return alert("이름과 비밀번호를 입력해주세요.");
         showLoading(true);
         try {
-            const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', id, pw }) });
+            const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', name, pw }) });
             const res = await resp.json();
             if(res.status === "Success") {
-                currentUser = { id, role: res.role };
+                currentUser = { id: name, role: res.role };
                 document.getElementById('login-container').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 if(currentUser.role === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
                 showTab('write');
-            } else {
-                alert("아이디 또는 비밀번호가 틀렸습니다.");
-            }
-        } catch(e) {
-            alert("서버 연결에 실패했습니다.");
-        } finally {
-            showLoading(false);
-        }
+            } else alert("정보가 일치하지 않습니다.");
+        } catch(e) { alert("연결 오류"); }
+        finally { showLoading(false); }
+    }
+
+    async function handleRegister() {
+        const name = document.getElementById('reg-name').value;
+        const pw = document.getElementById('reg-pw').value;
+        const role = document.getElementById('reg-role').value;
+        if(!name || pw.length < 4) return alert("이름과 숫자 4자리 비밀번호를 입력해주세요.");
+        showLoading(true);
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', name, pw, role }) });
+        alert("등록되었습니다!"); showLoading(false); toggleForm(false);
     }
 
     function showTab(tabId) {
@@ -192,20 +182,15 @@
         const type = document.getElementById('log-type').value;
         const content = document.getElementById('log-content').value;
         if(!content) return alert("내용을 입력하세요.");
-
         let details = {};
         if(type === '오늘의 커피') {
             details = { dosing: document.getElementById('coffee-dosing').value, time: document.getElementById('coffee-time').value, vol: document.getElementById('coffee-volume').value, taste: document.getElementById('coffee-taste').value };
         } else if(type === '베이커리 피드백') {
             details = { item: document.getElementById('bakery-name').value, qty: document.getElementById('bakery-qty').value };
         }
-
         showLoading(true);
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveLog', id: currentUser.id, type, content, details }) });
-        alert("기록되었습니다.");
-        // 초기화
-        document.getElementById('log-content').value = '';
-        showLoading(false);
+        alert("저장되었습니다."); document.getElementById('log-content').value = ''; showLoading(false);
     }
 
     function setStore(store) {
@@ -227,33 +212,15 @@
     function renderInventory() {
         const list = document.getElementById('inv-list');
         list.innerHTML = '';
-        // 시트 구조: [매장, 품목, 수량, 날짜]
         const filtered = inventoryData.slice(1).filter(r => r[0] === currentStore);
-        
-        if(filtered.length === 0) {
-            list.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">등록된 품목이 없습니다.</p>';
-            return;
-        }
-
         filtered.forEach(row => {
-            list.innerHTML += `
-                <div class="inv-row">
-                    <span style="font-weight:500;">${row[1]}</span>
-                    <div class="inv-controls">
-                        <button class="btn-circle" onclick="updateStock('${row[1]}', ${row[2]-1})">-</button>
-                        <span class="qty-badge">${row[2]}</span>
-                        <button class="btn-circle" onclick="updateStock('${row[1]}', ${row[2]+1})" style="background:var(--accent); color:white;">+</button>
-                    </div>
-                </div>`;
+            list.innerHTML += `<div class="inv-row"><span>${row[1]}</span><div class="inv-controls"><button class="btn-circle" onclick="updateStock('${row[1]}', ${row[2]-1})">-</button><span class="qty-badge">${row[2]}</span><button class="btn-circle" onclick="updateStock('${row[1]}', ${row[2]+1})" style="background:var(--accent); color:white;">+</button></div></div>`;
         });
     }
 
     async function updateStock(itemName, newStock) {
-        // Optimistic UI: 속도 향상을 위해 화면 먼저 업데이트
-        inventoryData = inventoryData.map(r => (r[0] === currentStore && r[1] === itemName) ? [r[0], r[1], newStock, new Date()] : r);
+        inventoryData = inventoryData.map(r => (r[0] === currentStore && r[1] === itemName) ? [r[0], r[1], newStock] : r);
         renderInventory();
-
-        // 백그라운드 서버 통신 (로딩 표시 안 함 - 체감 속도 향상)
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateInventory', store: currentStore, itemName, newStock }) });
     }
 
@@ -262,8 +229,7 @@
         if(!name) return;
         showLoading(true);
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateInventory', store: currentStore, itemName: name, newStock: 0 }) });
-        document.getElementById('new-inv-name').value = '';
-        loadInventory();
+        document.getElementById('new-inv-name').value = ''; loadInventory();
     }
 
     async function loadLogs() {
@@ -273,28 +239,10 @@
         const myDiv = document.getElementById('my-log-list');
         const allDiv = document.getElementById('all-log-list');
         myDiv.innerHTML = ''; allDiv.innerHTML = '';
-
         data.logs.slice(1).reverse().forEach(row => {
-            const date = new Date(row[0]).toLocaleDateString();
             const details = JSON.parse(row[4] || '{}');
             const feedback = row[5] || "";
-            
-            let detailHtml = "";
-            if(row[2] === '오늘의 커피') {
-                detailHtml = `<div style="font-size:12px; color:#666; background:#f9f9f9; padding:8px; border-radius:5px; margin-top:5px;">☕ ${details.dosing}g / ${details.time}초 / ${details.vol}ml<br>평가: ${details.taste}</div>`;
-            } else if(row[2] === '베이커리 피드백') {
-                detailHtml = `<div style="font-size:12px; color:#666; background:#f9f9f9; padding:8px; border-radius:5px; margin-top:5px;">🥐 ${details.item} : ${details.qty}개 남음</div>`;
-            }
-
-            const html = `
-                <div class="log-item">
-                    <div style="font-size:11px; color:#999;">${date} | ${row[1]} | ${row[2]}</div>
-                    <div style="margin-top:5px; font-weight:500;">${row[3]}</div>
-                    ${detailHtml}
-                    ${feedback ? `<div class="admin-reply"><b>답변:</b> ${feedback}</div>` : ''}
-                    ${currentUser.role === 'admin' ? `<button onclick="addFeedback('${row[0]}', '${row[1]}')" style="width:auto; padding:4px 8px; font-size:11px; margin-top:5px;">피드백 작성</button>` : ''}
-                </div>`;
-
+            const html = `<div style="padding:15px 0; border-bottom:1px solid #eee;"><div style="font-size:11px; color:#999;">${new Date(row[0]).toLocaleDateString()} | ${row[1]}</div><div style="font-weight:500;">${row[3]}</div>${feedback ? `<div style="background:#fffcf0; padding:10px; border-radius:8px; border-left:4px solid var(--accent); margin-top:10px; font-size:13px;"><b>답변:</b> ${feedback}</div>` : ''}${currentUser.role === 'admin' ? `<button onclick="addFeedback('${row[0]}', '${row[1]}')" style="width:auto; padding:4px 8px; font-size:11px; margin-top:5px;">피드백</button>` : ''}</div>`;
             if(row[1] === currentUser.id) myDiv.innerHTML += html;
             allDiv.innerHTML += html;
         });
@@ -302,7 +250,7 @@
     }
 
     async function addFeedback(date, id) {
-        const feedback = prompt("직원에게 전달할 피드백을 입력하세요:");
+        const feedback = prompt("피드백 입력:");
         if(!feedback) return;
         showLoading(true);
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'adminFeedback', logDate: date, logId: id, feedback }) });
