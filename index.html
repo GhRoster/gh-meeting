@@ -2,118 +2,120 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주간 운영 회의 플랫폼</title>
+    <title>카페 통합 관리 시스템 (Cloud)</title>
     <style>
-        :root {
-            --primary-color: #4a3f35; /* 커피 느낌의 브라운 */
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-        }
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        header {
-            text-align: center;
-            padding-bottom: 30px;
-            border-bottom: 2px solid var(--primary-color);
-            margin-bottom: 30px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .full-width { grid-column: 1 / -1; }
-        h2 { color: var(--primary-color); border-left: 4px solid var(--primary-color); padding-left: 10px; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 10px; }
-        .input-group { margin-top: 10px; }
-        textarea { width: 100%; height: 80px; border: 1px solid #ddd; border-radius: 5px; padding: 10px; resize: none; }
-        .btn-print { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right; }
-        
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-        }
+        /* (이전 스타일과 동일 - 지면상 중략) */
+        :root { --primary: #4a3f35; --bg: #f5f5f5; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; }
+        .hidden { display: none !important; }
+        #login-container { max-width: 400px; margin: 100px auto; padding: 20px; background: white; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 5px; }
+        header { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
+        .nav-tabs { display: flex; gap: 10px; padding: 10px; background: #eee; }
+        .card { background: white; margin: 10px; padding: 15px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>☕ 주간 운영 회의 (Weekly Monday)</h1>
-    <p id="current-date"></p>
-    <button class="btn-print" onclick="window.print()">PDF 저장/인쇄</button>
-</header>
+<div id="login-container">
+    <h2>☕ 카페 관리 로그인</h2>
+    <input type="text" id="user-id" placeholder="아이디">
+    <input type="password" id="user-pw" placeholder="비밀번호">
+    <button onclick="handleLogin()">로그인</button>
+</div>
 
-<div class="container">
-    <section class="card full-width">
-        <h2>📢 경영진 전달사항</h2>
-        <ul>
-            <li>이번 주 핵심 목표: 고객 서비스 품질 강화 및 원두 로스팅 프로파일 점검</li>
-            <li>공지: 신규 메뉴 출시 관련 일정 공유</li>
-        </ul>
-        <textarea placeholder="회의 중 결정된 경영진 지시사항을 입력하세요..."></textarea>
-    </section>
+<div id="main-app" class="hidden">
+    <header>
+        <span id="user-info"></span>
+        <button onclick="location.reload()" style="width:auto;">로그아웃</button>
+    </header>
+    <div class="nav-tabs">
+        <button onclick="showTab('write')">기록하기</button>
+        <button id="tab-admin" class="hidden" onclick="showTab('admin')">전체 취합</button>
+    </div>
 
-    <section class="card">
-        <h2>🏠 1호점 현황</h2>
-        <p><strong>담당: 매니저 A</strong></p>
-        <ul>
-            <li>매출 현황: 전주 대비 5% 상승</li>
-            <li>특이사항: 테라스 구역 조명 교체 필요</li>
-            <li>재고: 기센 W6 로스팅 원두(블렌딩A) 소진 임박</li>
-        </ul>
-        <textarea placeholder="1호점 이슈 기록..."></textarea>
-    </section>
+    <div id="sec-write" class="card">
+        <h3>📝 신규 내역 기록</h3>
+        <select id="log-type">
+            <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
+            <option value="손님 요청사항">💬 손님 요청사항</option>
+            <option value="매장 보수 필요">🔧 매장 보수 필요</option>
+            <option value="직원 요청 사항">🙋 직원 요청 사항</option>
+        </select>
+        <textarea id="log-content" placeholder="내용을 입력하세요..."></textarea>
+        <button onclick="saveLog()">구글 시트에 저장</button>
+    </div>
 
-    <section class="card">
-        <h2>🏠 2호점 현황</h2>
-        <p><strong>담당: 매니저 B</strong></p>
-        <ul>
-            <li>매출 현황: 안정적 유지</li>
-            <li>특이사항: 인근 오피스 단체 주문(수요일) 예약 확인</li>
-            <li>재고: 우유 및 부자재 발주 완료</li>
-        </ul>
-        <textarea placeholder="2호점 이슈 기록..."></textarea>
-    </section>
-
-    <section class="card full-width">
-        <h2>🔥 로스팅 & QC (Giesen W6)</h2>
-        <ul>
-            <li>이번 주 로스팅 계획: 싱글 오리진 3종, 하우스 블렌드 50kg</li>
-            <li>생두 수급: 에티오피아 뉴크롭 입고 예정</li>
-            <li>기기 점검: 배기 덕트 청소 및 가스압 체크</li>
-        </ul>
-    </section>
-
-    <section class="card full-width">
-        <h2>✅ Action Items (이번 주 할 일)</h2>
-        <ul id="action-list">
-            <li><input type="checkbox"> 1호점 조명 교체 건 업체 연락 (수요일까지)</li>
-            <li><input type="checkbox"> 신규 로스팅 프로파일 테스트 및 커핑 (금요일)</li>
-            <li><input type="checkbox"> 전 직원 위생 교육 자료 배포</li>
-        </ul>
-    </section>
+    <div id="sec-admin" class="card hidden">
+        <h3>📊 전 매장 통합 리포트</h3>
+        <table id="admin-table">
+            <thead><tr><th>날짜</th><th>매장</th><th>구분</th><th>내용</th></tr></thead>
+            <tbody id="admin-list"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    // 오늘 날짜 표시
-    const now = new Date();
-    document.getElementById('current-date').innerText = 
-        `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 회의 기록`;
-</script>
+    const API_URL = "여기에_구글_앱스_스크립트_URL을_넣으세요"; 
+    let currentUser = null;
 
+    async function handleLogin() {
+        const id = document.getElementById('user-id').value;
+        const pw = document.getElementById('user-pw').value;
+        
+        const resp = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'login', id, pw })
+        });
+        const result = await resp.text();
+
+        if (result !== "Fail") {
+            const data = JSON.parse(result);
+            currentUser = { id, role: data.role };
+            initApp();
+        } else {
+            alert("로그인 실패");
+        }
+    }
+
+    function initApp() {
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('user-info').innerText = `${currentUser.id}님 환영합니다.`;
+        if (currentUser.role === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
+    }
+
+    function showTab(tabId) {
+        document.getElementById('sec-write').classList.toggle('hidden', tabId !== 'write');
+        document.getElementById('sec-admin').classList.toggle('hidden', tabId !== 'admin');
+        if (tabId === 'admin') loadLogs();
+    }
+
+    async function saveLog() {
+        const type = document.getElementById('log-type').value;
+        const content = document.getElementById('log-content').value;
+        const branch = currentUser.role === 'admin' ? '본사' : (currentUser.id.includes('1') ? '1호점' : '2호점');
+
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'saveLog', id: currentUser.id, branch, type, content })
+        });
+        alert("시트에 저장되었습니다!");
+        document.getElementById('log-content').value = '';
+    }
+
+    async function loadLogs() {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        const list = document.getElementById('admin-list');
+        list.innerHTML = '';
+        data.slice(1).reverse().forEach(row => {
+            list.innerHTML += `<tr><td>${new Date(row[0]).toLocaleDateString()}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
+        });
+    }
+</script>
 </body>
 </html>
