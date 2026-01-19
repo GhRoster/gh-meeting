@@ -45,11 +45,16 @@
         <div id="sec-write" class="card">
             <h3>📝 신규 내역 기록</h3>
             <select id="log-type" title="기록 유형 선택">
-                <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
-                <option value="손님 요청사항">💬 손님 요청사항</option>
-                <option value="매장 보수 필요">🔧 매장 보수 필요</option>
-                <option value="직원 요청 사항">🙋 직원 요청 사항</option>
-            </select>
+    <optgroup label="[품질/생산]">
+        <option value="원두 로스팅 품질">🔥 원두 로스팅 품질 (Giesen)</option>
+        <option value="베이커리 생산/품절">🥐 베이커리 생산 및 품절</option>
+    </optgroup>
+    <optgroup label="[매장 운영]">
+        <option value="고객 컴플레인">⚠️ 고객 컴플레인</option>
+        <option value="시설 보수/청결">🔧 시설 보수 및 청결</option>
+        <option value="직원 요청/안건">🙋 직원 요청 및 안건</option>
+    </optgroup>
+</select>
             <textarea id="log-content" placeholder="내용을 입력하세요..." title="내역 상세 내용"></textarea>
             <button onclick="saveLog()">기록 제출</button>
         </div>
